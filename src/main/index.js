@@ -1,93 +1,105 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
-import { join } from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
+import { app, shell, BrowserWindow, ipcMain, Tray, Menu, nativeImage } from 'electron';
+import { join } from 'path';
+import { electronApp, optimizer, is } from '@electron-toolkit/utils';
+import AutoLaunch from 'auto-launch';
+
+let mainWindow = null; // Definir la variable globalmente
+let tray = null; // Evitar doble definición
 
 function createWindow() {
-  // Create the browser window.
-  const mainWindow = new BrowserWindow({
-     width: 800, // Ancho del widget
-    height: 400, // Alto del widget
-    resizable: false, // No se puede redimensionar
-    frame: false, // Sin barra de título
-    transparent: true, // Fondo transparente
-    //skipTaskbar: true, // No aparece en la barra de tareas
-    show: false, // No mostrar hasta que esté lista
-    //autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
+  mainWindow = new BrowserWindow({
+    width: 400,
+    height: 200,
+    resizable: false,
+    frame: false,
+    transparent: true,
+    skipTaskbar: true,
+    show: false,
+    alwaysOnTop: true,
+    icon: process.platform === 'linux' ? join(__dirname, '../../resources/icon.png') : undefined,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       nodeIntegration: true,
       sandbox: false
     }
-  })
+  });
 
- 
+  if (process.platform === 'darwin') {
+    app.dock.hide();
+  }
 
-  mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
-    mainWindow.webContents.openDevTools(); // Abre las DevTools cuando la ventana esté lista
-  })
+  // Mostrar la ventana cuando esté lista
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+    if (is.dev) {
+      mainWindow.webContents.openDevTools();
+      }
+  });
 
-  // HMR for renderer base on electron-vite cli.
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+  // Cargar la app según el entorno
+  const appURL = process.env['ELECTRON_RENDERER_URL'];
+  if (is.dev && appURL) {
+    mainWindow.loadURL(appURL);
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    mainWindow.loadFile(join(__dirname, '../renderer/index.html'));
   }
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
-  })
+    shell.openExternal(details.url);
+    return { action: 'deny' };
+  });
 
-  
-
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
-  } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
-  }
+  mainWindow.on('minimize', (event) => {
+    event.preventDefault();
+    mainWindow.hide();
+  });
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
+// Configurar auto-launch
+const spotifyWidgetAutoLauncher = new AutoLaunch({
+  name: 'SpotifyWidget',
+  path: app.getPath('exe')
+});
+
+spotifyWidgetAutoLauncher.isEnabled()
+  .then((isEnabled) => {
+    if (!isEnabled) spotifyWidgetAutoLauncher.enable();
+  })
+  .catch((err) => console.error('Error al verificar auto-launch:', err));
+
 app.whenReady().then(() => {
-  // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
+  electronApp.setAppUserModelId('com.spotify.widget');
 
-  
+  // Configurar icono en la bandeja del sistema
+  const trayIcon = nativeImage.createFromPath(trayIconPath);
+  const trayIconPath = join(__dirname, '../../resources/icon.png');
+  tray = new Tray(nativeImage.createFromPath(trayIconPath));
+  const contextMenu = Menu.buildFromTemplate([
+    { label: 'Mostrar', click: () => mainWindow.show() },
+    { label: 'Salir', click: () => {
+        mainWindow.destroy();
+        app.quit();
+      } 
+    }
+  ]);
 
-  // Default open or close DevTools by F12 in development
-  // and ignore CommandOrControl + R in production.
-  // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
-  app.on('browser-window-created', (_, window) => {
-    optimizer.watchWindowShortcuts(window)
-  })
+  tray.setToolTip('Spotify Widget');
+  tray.setContextMenu(contextMenu);
+  tray.on('click', () => mainWindow.show());
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
+  createWindow();
 
-  createWindow()
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
+});
 
-  app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
-})
-
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
+// Cerrar la app correctamente en Windows y Linux
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit()
+    app.quit();
   }
-})
+});
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
+// IPC para debug
+ipcMain.on('ping', () => console.log('pong'));
