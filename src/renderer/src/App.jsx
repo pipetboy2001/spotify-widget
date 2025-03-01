@@ -10,7 +10,8 @@ function App() {
     duration: 0,
   });
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // State to check if logged in
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // 🔑 Environment variables
   const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
@@ -21,15 +22,15 @@ function App() {
     "user-read-currently-playing"
   ];
 
-  // 🟢 Check if already logged in
+  // 🟢  Verifica sesión en localStorage
   useEffect(() => {
     const accessToken = localStorage.getItem("spotify_access_token");
     if (accessToken) {
-      setIsLoggedIn(true); // If token exists, logged in
+      setIsLoggedIn(true); 
     }
   }, []);
 
-  // 🟢 Save access token in localStorage
+  // 🟢 Guarda el token si se autentica
   useEffect(() => {
     const hash = window.location.hash;
     if (hash) {
@@ -38,13 +39,13 @@ function App() {
 
       if (accessToken) {
         localStorage.setItem("spotify_access_token", accessToken);
-        window.location.hash = ""; // Clear the URL
-        setIsLoggedIn(true); // Mark user as logged in
+        window.location.hash = "";
+        setIsLoggedIn(true); 
       }
     }
   }, []);
 
-  // 🔑 Function to log in with Spotify
+  // 🔑 Login con Spotify
   const loginWithSpotify = () => {
     const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scopes.join("%20")}`;
     window.location.href = authUrl;
@@ -54,13 +55,18 @@ function App() {
   const logout = () => {
     localStorage.removeItem("spotify_access_token");
     setIsLoggedIn(false);
-    window.location.reload(); // Reload the page to clear the state
+    setTrack({ title: "", artist: "", albumArt: "", progress: 0, duration: 0 });
+    //window.location.reload(); // Reload the page to clear the state
   };
 
   // 🎵 Get the current song
   const fetchCurrentlyPlaying = async () => {
+    setIsLoading(true);
     const accessToken = localStorage.getItem("spotify_access_token");
-    if (!accessToken) return;
+    if (!accessToken) {
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const res = await fetch("https://api.spotify.com/v1/me/player/currently-playing", {
@@ -72,12 +78,13 @@ function App() {
         const lastTrack = JSON.parse(localStorage.getItem("lastTrack") || "{}");
         if (lastTrack.name) {
           setTrack({
-            title: lastTrack.name,
-            artist: lastTrack.artists.map(a => a.name).join(", "),
-            albumArt: "", // We won't use the image
+            title: "No hay música reproduciéndose 🎧",
+            artist: "",
+            albumArt: "",
             progress: 0,
-            duration: lastTrack.duration_ms || 0,
+            duration: 0,
           });
+          setIsLoading(false);
         }
         return;
       }
@@ -94,47 +101,36 @@ function App() {
           duration: data.item.duration_ms || 0,
         });
       } else {
-        console.log("No song currently playing");
+        console.error("Error al obtener la canción:", error);
       }
     } catch (error) {
       console.error("Error fetching currently playing song:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // ⏯️ Start playback if Spotify is closed
-  const startPlayback = async () => {
-    const accessToken = localStorage.getItem("spotify_access_token");
-    if (!accessToken) return;
-
-    const res = await fetch("https://api.spotify.com/v1/me/player", {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
-    const data = await res.json();
-
-    if (!data?.is_playing) {
-      await fetch("https://api.spotify.com/v1/me/player/play", {
-        method: "PUT",
-        headers: { Authorization: `Bearer ${accessToken}` }
-      });
-    }
-  };
-
-  // ⏳ Auto-update the song every 5 seconds
   useEffect(() => {
-    const interval = setInterval(fetchCurrentlyPlaying, 1000);
-    return () => clearInterval(interval);
-  }, []);
+    if (isLoggedIn) {
+      fetchCurrentlyPlaying();
+      const interval = setInterval(fetchCurrentlyPlaying, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [isLoggedIn]);
+
 
   // Calculate song progress as a percentage
-  const progressPercentage = (track.progress / track.duration) * 100;
+  const progressPercentage = track.duration > 0 ? (track.progress / track.duration) * 100 : 0;
 
   return (
     <div className="widget-container container-fluid bg-dark text-white rounded-3 shadow-lg p-3" style={{ width: "320px" }}>
       {/* Barra superior de arrastre */}
       <div className="drag-bar d-flex justify-content-between align-items-center bg-secondary px-3 py-2 rounded-3">
         <span className="text-light small widget-title">
-          <FaMusic className="me-1" /> 
+          <FaMusic className="me-1" />  
+          Spotify Widget
         </span>
+
         {isLoggedIn ? (
           <button className="btn btn-sm btn-outline-danger" onClick={logout}>
             <FaSignOutAlt />
@@ -148,7 +144,10 @@ function App() {
 
       {/* Contenido */}
       <div className="d-flex align-items-center mt-3 content-widget">
-        {track.title ? (
+        {!isLoggedIn && (
+          <p className="text-secondary text-center w-100">No has iniciado sesión en Spotify 🎧</p>
+        )}
+        {isLoggedIn && track.title && (
           <>
             {/* Portada del álbum (izquierda) */}
             <div className="rounded-3 overflow-hidden shadow-sm" style={{ width: "80px", height: "80px" }}>
@@ -177,7 +176,8 @@ function App() {
               )}
             </div>
           </>
-        ) : (
+        )}
+        {isLoggedIn && !track.title && (
           <p className="text-secondary text-center w-100">No hay música reproduciéndose 🎧</p>
         )}
       </div>
