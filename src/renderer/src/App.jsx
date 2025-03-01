@@ -151,7 +151,13 @@ function App() {
           <>
             {/* Portada del álbum (izquierda) */}
             <div className="rounded-3 overflow-hidden shadow-sm" style={{ width: "80px", height: "80px" }}>
+              {track.albumArt ? (
               <img src={track.albumArt} alt="Album Art" className="img-fluid w-100 h-100 object-fit-cover" />
+              ) : (
+              <div className="d-flex justify-content-center align-items-center h-100 bg-secondary text-white">
+                <FaMusic size={32} />
+              </div>
+              )}
             </div>
 
             {/* Información de la canción (derecha) */}
