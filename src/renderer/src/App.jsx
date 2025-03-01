@@ -134,9 +134,15 @@ function App() {
         {/* Barra superior de arrastre */}
         <div className="drag-bar">
           <span className="drag-placeholder"></span> {/* Para mantener el botón alineado */}
-          <button className="logout-button" onClick={logout}>
-            <FaSignOutAlt />
-          </button>
+          {isLoggedIn ? (
+            <button className="logout-button" onClick={logout}>
+              <FaSignOutAlt />
+            </button>
+          ) : (
+            <button className="login-button" onClick={loginWithSpotify}>
+              <FaSpotify /> Iniciar sesión
+            </button>
+          )}
         </div>
 
         <div className="content">
@@ -150,12 +156,6 @@ function App() {
               <div className="progress" style={{ width: `${progressPercentage}%` }}></div>
             </div>
           )}
-
-          <div className="controls">
-            <button className="control-button"><FaBackward /></button>
-            <button className="control-button" onClick={startPlayback}><FaPlay /></button>
-            <button className="control-button"><FaForward /></button>
-          </div>
         </div>
       </div>
     </div>

@@ -19,7 +19,6 @@ body {
   border-radius: 16px;
   text-align: center;
   overflow: hidden;
-  -webkit-app-region: drag;
 }
 
 .widget {
@@ -177,6 +176,7 @@ body {
   justify-content: flex-end;
   align-items: center;
   padding-right: 8px;
+  -webkit-app-region: drag;
 }
 
 /* Otros estilos del contenido */
