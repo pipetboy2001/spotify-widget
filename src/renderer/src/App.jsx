@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaBackward, FaPlay, FaForward, FaSpotify, FaSignOutAlt } from "react-icons/fa";
+import { FaBackward, FaPlay, FaForward, FaSpotify, FaSignOutAlt, FaMusic } from "react-icons/fa";
 
 function App() {
   const [track, setTrack] = useState({
@@ -129,38 +129,57 @@ function App() {
   const progressPercentage = (track.progress / track.duration) * 100;
 
   return (
-    <div className="widget-container">
-      <div className="widget">
-        {/* Barra superior de arrastre */}
-        <div className="drag-bar">
-          <span className="drag-placeholder"></span> {/* Para mantener el botón alineado */}
-          {isLoggedIn ? (
-            <button className="logout-button" onClick={logout}>
-              <FaSignOutAlt />
-            </button>
-          ) : (
-            <button className="login-button" onClick={loginWithSpotify}>
-              <FaSpotify /> Iniciar sesión
-            </button>
-          )}
-        </div>
+    <div className="widget-container container-fluid bg-dark text-white rounded-3 shadow-lg p-3" style={{ width: "320px" }}>
+      {/* Barra superior de arrastre */}
+      <div className="drag-bar d-flex justify-content-between align-items-center bg-secondary px-3 py-2 rounded-3">
+        <span className="text-light small widget-title">
+          <FaMusic className="me-1" /> 
+        </span>
+        {isLoggedIn ? (
+          <button className="btn btn-sm btn-outline-danger" onClick={logout}>
+            <FaSignOutAlt />
+          </button>
+        ) : (
+          <button className="btn btn-sm btn-success d-flex align-items-center gap-2" onClick={loginWithSpotify}>
+            <FaSpotify /> <span>Iniciar sesión</span>
+          </button>
+        )}
+      </div>
 
-        <div className="content">
-
-          <div className="album-art">
-            <img src={track.albumArt} alt="Album Art" />
-          </div>
-          <div className="info">
-            <h3>{track.title}</h3>
-            <p>{track.artist}</p>
-          </div>
-
-          {track.duration > 0 && (
-            <div className="progress-bar">
-              <div className="progress" style={{ width: `${progressPercentage}%` }}></div>
+      {/* Contenido */}
+      <div className="d-flex align-items-center mt-3 content-widget">
+        {track.title ? (
+          <>
+            {/* Portada del álbum (izquierda) */}
+            <div className="rounded-3 overflow-hidden shadow-sm" style={{ width: "80px", height: "80px" }}>
+              <img src={track.albumArt} alt="Album Art" className="img-fluid w-100 h-100 object-fit-cover" />
             </div>
-          )}
-        </div>
+
+            {/* Información de la canción (derecha) */}
+            <div className="ms-3 flex-grow-1">
+              <h3 className="h6 mb-1">{track.title}</h3>
+              <p className="text-secondary small m-0">{track.artist}</p>
+
+              {/* Barra de progreso */}
+              {track.duration > 0 && (
+                <div className="mt-2">
+                  <div className="progress" style={{ height: "4px" }}>
+                    <div
+                      className="progress-bar bg-success"
+                      role="progressbar"
+                      style={{ width: `${(track.progress / track.duration) * 100}%` }}
+                    ></div>
+                  </div>
+                  <small className="text-secondary">
+                    {new Date(track.progress).toISOString().substr(14, 5)} / {new Date(track.duration).toISOString().substr(14, 5)}
+                  </small>
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          <p className="text-secondary text-center w-100">No hay música reproduciéndose 🎧</p>
+        )}
       </div>
     </div>
   );

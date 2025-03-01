@@ -1,4 +1,5 @@
-/* Fondo general con degradado */
+
+/* 🟢 Fondo general con degradado (mantiene transparencia) */
 body {
   display: flex;
   align-items: center;
@@ -8,267 +9,104 @@ body {
   font-family: 'Inter', sans-serif;
   overflow: hidden;
   margin: 0;
-  /* fondo transparente */
   background: transparent;
-
 }
 
-/* Contenedor del widget */
+/* 🎵 Widget (Caja principal) */
 .widget-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  padding: 20px;
+  background: rgba(30, 30, 30, 0.8);
+  /* Efecto glassmorphism */
+  backdrop-filter: blur(10px);
   border-radius: 16px;
-  text-align: center;
-  overflow: hidden;
-}
-
-/* Widget principal con fondo semitransparente y bordes redondeados */
-.widget {
-  position: relative;
+  padding: 15px;
   width: 320px;
-  border-radius: 16px;
-  padding: 16px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-  overflow: hidden;
-  background: linear-gradient(135deg, #2c3e50, #4ca1af);
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease-in-out;
 }
 
-/* Barra superior para arrastrar */
+.widget-container:hover {
+  transform: scale(1.02);
+}
+
+/* 🔲 Barra superior de arrastre */
 .drag-bar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 14px;
-  background: rgba(255, 255, 255, 0.15);
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
-  cursor: grab;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
-  padding-right: 8px;
-  -webkit-app-region: drag;
+  background: rgba(50, 50, 50, 0.6);
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
 }
 
-/* Botón de logout con tooltip y animación hover */
+/* 🚀 Botón de logout */
 .logout-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
+  
+  background: rgba(255, 0, 0, 0.2);
+  color: #ff4d4d;
   border: none;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  transition: color 0.2s ease-in-out;
-  padding: 4px;
-}
-
-.logout-button:hover {
-  color: #ff4747;
-}
-
-.logout-button:hover::after {
-  content: "Cerrar sesión";
-  position: absolute;
-  top: -25px;
-  right: 0;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 12px;
-}
-
-/* Contenido del widget */
-.content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  overflow: hidden;
-}
-
-/* Información de la canción */
-.info h3 {
-  font-size: 20px;
-  /* Aumentamos el tamaño */
-  margin: 12px 0 5px;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
-  /* Sutil sombra */
-}
-
-.info p {
-  font-size: 14px;
-  color: #dcdcdc;
-  /* Color ligeramente más claro para diferenciar */
-}
-
-
-/* Animación de brillo sutil */
-@keyframes progressGlow {
-  0% {
-    box-shadow: 0 0 5px #1db954;
-  }
-
-  50% {
-    box-shadow: 0 0 10px #1db954;
-  }
-
-  100% {
-    box-shadow: 0 0 5px #1db954;
-  }
-}
-
-/* Bolita que indica el progreso actual */
-.progress::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  right: 0;
-  transform: translate(50%, -50%);
-  width: 8px;
-  height: 8px;
-  background: #1db954;
-  border-radius: 50%;
-}
-
-/* Duración o minutos */
-.minute {
-  font-size: 12px;
-  opacity: 0.8;
-}
-
-/* Controles (si los tienes) */
-.controls {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.control-button {
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  color: white;
-  font-size: 14px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  transition: background 0.2s ease-in-out;
-}
-
-.control-button:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.control-button:active {
-  transform: scale(0.95);
-  box-shadow: inset 3px 3px 5px rgba(0, 0, 0, 0.3);
-}
-
-/* Botones de autenticación (login/logout) */
-.auth-button {
-  background: linear-gradient(145deg, #ff4747, #c03a3a);
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-size: 16px;
-  font-weight: bold;
-  color: white;
-  cursor: pointer;
-  margin-top: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+  padding: 5px;
+  border-radius: 6px;
   transition: all 0.2s ease-in-out;
 }
 
-.auth-button:hover {
-  background: #d63030;
-  transform: scale(1.05);
+.logout-button:hover {
+  background: rgba(255, 0, 0, 0.4);
 }
 
-.auth-button:active {
-  transform: scale(0.95);
-  box-shadow: inset 3px 3px 5px rgba(0, 0, 0, 0.3);
-}
-
-/* Botón de conexión con Spotify */
-.auth-button.spotify {
-  background: #1db954;
-}
-
-.auth-button.spotify:hover {
-  background: #17a74b;
-}
-
-/* Contenedor de la barra de progreso con tiempos */
-.progress-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 90%;
-  margin-top: 10px;
-  font-size: 12px;
-  color: #dcdcdc;
-}
-
-/* Barra de progreso */
-.progress-bar {
-  position: relative;
-  width: 70%;
-  height: 6px;
-  background: gray;
-  border-radius: 3px;
+/* 🎶 Imagen del álbum */
+.album-art {
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
   overflow: hidden;
-  margin: 0 8px;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.4);
 }
 
-/* Progreso con animación de brillo */
-.progress {
+/* 📝 Información de la canción */
+.song-info h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.song-info p {
+  font-size: 13px;
+  color: #bbb;
+  margin: 2px 0 0;
+}
+
+/* 🎚 Barra de progreso */
+.progress-container {
+  margin-top: 8px;
+}
+
+.progress-bar {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
   position: relative;
+}
+
+.progress {
   height: 100%;
-  background: #1db954;
-  border-radius: 3px;
-  transition: width 0.3s;
-  animation: progressGlow 1s infinite;
+  background: linear-gradient(90deg, #00ff88, #00ccff);
+  border-radius: 10px;
+  transition: width 0.5s ease-in-out;
+  box-shadow: 0px 0px 5px rgba(0, 255, 136, 0.6);
 }
 
-/* Bolita que indica el progreso actual */
-.progress::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  right: 0;
-  transform: translate(50%, -50%);
-  width: 8px;
-  height: 8px;
-  background: #1db954;
-  border-radius: 50%;
-}
-
-/* Tiempo transcurrido y duración total */
+/* ⏳ Tiempo de reproducción */
 .time {
+  display: flex;
+  justify-content: space-between;
   font-size: 12px;
-  opacity: 0.8;
+  color: #ccc;
+  margin-top: 2px;
 }
 
-.album-art img {
-  width: 100px;
-  /* Ajusta el tamaño según necesites */
-  height: 100px;
-  object-fit: cover;
-  /* Para mantener la proporción y recortar si es necesario */
-  border-radius: 8px;
-  /* Opcional, para esquinas redondeadas */
+.content-widget{
+    -webkit-app-region: drag;
 }
