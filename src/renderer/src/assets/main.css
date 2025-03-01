@@ -12,82 +12,8 @@ body {
   background: transparent;
 }
 
-/* 🎵 Widget (Caja principal) */
-.widget-container {
-  background: rgba(30, 30, 30, 0.8);
-  /* Efecto glassmorphism */
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 15px;
-  width: 320px;
-  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
-  transition: transform 0.2s ease-in-out;
-}
-
-.widget-container:hover {
-  transform: scale(1.02);
-}
-
-/* 🔲 Barra superior de arrastre */
-.drag-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(50, 50, 50, 0.6);
-  padding: 8px 12px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-/* 🚀 Botón de logout */
-.logout-button {
-  
-  background: rgba(255, 0, 0, 0.2);
-  color: #ff4d4d;
-  border: none;
-  padding: 5px;
-  border-radius: 6px;
-  transition: all 0.2s ease-in-out;
-}
-
-.logout-button:hover {
-  background: rgba(255, 0, 0, 0.4);
-}
-
-/* 🎶 Imagen del álbum */
-.album-art {
-  width: 80px;
-  height: 80px;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.4);
-}
-
-/* 📝 Información de la canción */
-.song-info h3 {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0;
-}
-
-.song-info p {
-  font-size: 13px;
-  color: #bbb;
-  margin: 2px 0 0;
-}
-
-/* 🎚 Barra de progreso */
-.progress-container {
-  margin-top: 8px;
-}
-
-.progress-bar {
-  height: 5px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  overflow: hidden;
-  position: relative;
+.content-widget {
+  -webkit-app-region: drag;
 }
 
 .progress {
@@ -98,15 +24,4 @@ body {
   box-shadow: 0px 0px 5px rgba(0, 255, 136, 0.6);
 }
 
-/* ⏳ Tiempo de reproducción */
-.time {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: #ccc;
-  margin-top: 2px;
-}
 
-.content-widget{
-    -webkit-app-region: drag;
-}

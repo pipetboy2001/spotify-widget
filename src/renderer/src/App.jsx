@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaBackward, FaPlay, FaForward, FaSpotify, FaSignOutAlt, FaMusic } from "react-icons/fa";
+import { FaSpotify, FaSignOutAlt, FaMusic } from "react-icons/fa";
 
 function App() {
   const [track, setTrack] = useState({
@@ -121,7 +121,7 @@ function App() {
 
   // ⏳ Auto-update the song every 5 seconds
   useEffect(() => {
-    const interval = setInterval(fetchCurrentlyPlaying, 5000);
+    const interval = setInterval(fetchCurrentlyPlaying, 1000);
     return () => clearInterval(interval);
   }, []);
 
